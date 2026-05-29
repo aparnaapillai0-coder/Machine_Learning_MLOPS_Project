@@ -3,7 +3,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 #------------------------Data Ingestion-------------------
 RAW_DIR = os.path.join(BASE_DIR, "artifacts", "raw")
-RAW_FILE_PATH = os.path.join(RAW_DIR, "creditcard.csv") # artifacts/raw/raw.csv
+RAW_FILE_PATH = os.path.join(RAW_DIR, "raw.csv") # artifacts/raw/raw.csv
 TRAIN_FILE_PATH = os.path.join(RAW_DIR, "train.csv") # artifacts/raw/train.csv
 TEST_FILE_PATH = os.path.join(RAW_DIR, "test.csv") # artifacts/raw/test.csv
 
