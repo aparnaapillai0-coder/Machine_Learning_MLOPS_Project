@@ -3,6 +3,7 @@ from src.logger import get_logger
 import joblib
 from config.config_paths import MODEL_OUTPUT_PATH
 import numpy as np
+import pandas as pd
 
 logger = get_logger(__name__)
 
@@ -34,7 +35,16 @@ def index():
         V26 = int(request.form["V26"])
         V27 = int(request.form["V27"])
 
-        features = np.array([[V12, Amount, V4, V3, V2, V10, V18, V13, V14, V1, Time, V20, V22, V5, V9, V7, V21, V24, V26, V27]])
+        features = pd.DataFrame(
+    [[V12, Amount, V4, V3, V2, V10, V18, V13, V14, V1,
+      Time, V20, V22, V5, V9, V7, V21, V24, V26, V27]],
+    columns=[
+        'V12', 'Amount', 'V4', 'V3', 'V2',
+        'V10', 'V18', 'V13', 'V14', 'V1',
+        'Time', 'V20', 'V22', 'V5', 'V9',
+        'V7', 'V21', 'V24', 'V26', 'V27'
+    ]
+)
 
         prediction = model_loaded.predict(features)
 
