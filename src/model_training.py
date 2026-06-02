@@ -33,21 +33,9 @@ class ModelTraining:
             logger.info(f"Loading data from: {self.test_path}")
             test_df = load_data(self.test_path)
 
-            logger.info(f"Train Data Shape: {train_df.shape}")
-            logger.info(f"Test Data Shape: {test_df.shape}")
-
-            print("\nTrain Columns:\n", train_df.columns.tolist())
-            print("\nTest Columns:\n", test_df.columns.tolist())
-
-            # Check if target column exists
-            if 'Class' not in train_df.columns:
-                raise Exception("'Class' column not found in training dataset")
-
-            if 'Class' not in test_df.columns:
-                raise Exception("'Class' column not found in testing dataset")
-
             X_train = train_df.drop(columns=['Class'])
             y_train = train_df['Class']
+
 
             X_test = test_df.drop(columns=['Class'])
             y_test = test_df['Class']
@@ -66,7 +54,6 @@ class ModelTraining:
             lgbm_cls_model = lbg.LGBMClassifier(random_state=self.random_search_params["random_state"])
 
             logger.info("Starting our HyperParameter Tunning...")
-
             random_search = RandomizedSearchCV(
                 estimator = lgbm_cls_model,
                 param_distributions=self.params_dist,
@@ -83,11 +70,11 @@ class ModelTraining:
             logger.info("HyperParameter Tunning is Completed Successfully...!")
 
             best_params = random_search.best_params_
-            best_model = random_search.best_estimator_
+            best_estimator_of_lgbm_model = random_search.best_estimator_
 
-            logger.info(f"Best Parameters: {best_params}")
+            logger.info(f"Best Parameters are: {best_params}")
 
-            return best_model
+            return best_estimator_of_lgbm_model
         
         except Exception as e:
             logger.error("Error while Training the Model & HyperParamater Tunning")
@@ -121,8 +108,10 @@ class ModelTraining:
         
     def save_model(self, model):
         try:
+            # Creating a Directory 
             os.makedirs(os.path.dirname(MODEL_OUTPUT_PATH),exist_ok=True)
             logger.info("Saving the Model")
+
             joblib.dump(model, self.model_output_path)
             logger.info(f"Successfully Model is Saved into: {self.model_output_path}")
 
@@ -133,23 +122,19 @@ class ModelTraining:
     def run(self):
         try:
             # 1. Load & Split the Data
-            logger.info("Started Model Training Pipeline")
-            X_train, y_train, X_test, y_test = (
-                self.load_data_and_split_data()
-            )
+            logger.info("Started our Model Training Pipleing..")
+            X_train, y_train, X_test, y_test = self.load_data_and_split_data()
 
             # 2. train_model_lgbm
-            best_model = self.train_model_lgbm(X_train, y_train)
+            best_estimator_of_lgbm_model = self.train_model_lgbm(X_train, y_train)
 
             # 3. Evaluating the Model
-            metrics = self.evaluate_model(best_model, X_test, y_test)
-            print("\nModel Evaluation Metrics:")
-            print(metrics)
+            metrics = self.evaluate_model(best_estimator_of_lgbm_model, X_test, y_test)
 
             # 4. Saving the Model
-            self.save_model(best_model)
+            self.save_model(best_estimator_of_lgbm_model)
 
-            logger.info("Model Training Pipeline Completed Successfully")
+            logger.info("Model Training Successfully Completed....!")
 
         except Exception as e:
             logger.error("Error in Model Training Pipeline")
@@ -157,11 +142,5 @@ class ModelTraining:
         
 
 if __name__ == "__main__":
-
-    model_trainer = ModelTraining(
-        PROCESSED_TRAIN_FILE_PATH,
-        PROCESSED_TEST_FILE_PATH,
-        MODEL_OUTPUT_PATH
-    )
-
+    model_trainer = ModelTraining(PROCESSED_TRAIN_FILE_PATH, PROCESSED_TEST_FILE_PATH, MODEL_OUTPUT_PATH)
     model_trainer.run()
