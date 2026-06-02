@@ -38,6 +38,6 @@ data_preprocessing:
     - Amount
     - Class
 
-  skewness_thresold: 0.5
-  no_of_features : 10
+  skewness_thresold: 5
+  no_of_features : 20
 
