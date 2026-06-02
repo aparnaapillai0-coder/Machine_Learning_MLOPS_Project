@@ -13,7 +13,6 @@ import sys
 logger = get_logger(__name__)
 
 class DataProcessing():
-
     def __init__(self, train_path, test_path, processed_dir, config_path):
         self.train_path = train_path
         self.test_path = test_path
@@ -22,7 +21,7 @@ class DataProcessing():
 
         if not os.path.exists(self.processed_dir):
             os.makedirs(self.processed_dir)
-            
+        
     def process_the_data(self, df):
         try:
             logger.info("Preprocessing step is Started....!")
@@ -86,56 +85,69 @@ class DataProcessing():
         
     def features_selection(self, df):
         try:
-            logger.info("Started Feature Selection")
+            # 1. Seggregating X & Y
+            logger.info("Started with Feature Selection Process....")
+
             X = df.drop('Class', axis=1)
             y = df['Class']
-            
+
+            # 2. Training Model
             model_lr = LogisticRegression(
-            max_iter=2000,
-            class_weight='balanced',
-            solver='liblinear'
+                max_iter=2000,
+                class_weight='balanced',
+                solver='liblinear'
             )
-            
+
             model_lr.fit(X, y)
-            
+
+            # 3. Feature Importance
             feature_importances = np.abs(model_lr.coef_[0])
-            
-            df_importance = pd.DataFrame({
-            "feature": X.columns,
-            "importance": feature_importances
+
+            df_feature_importances = pd.DataFrame({
+                'feature': X.columns,
+                'importance': feature_importances
             })
-            
-            top_n = self.config_path["data_preprocessing"]["no_of_features"]
-            
-            top_features = df_importance.sort_values(
-            by="importance",
-            ascending=False
-            )["feature"].head(top_n).values
-            
-            logger.info(f"Selected Features: {top_features}")
-            
-            # KEEP ONLY FEATURES
-            X_selected = df[top_features.tolist()]
-            
-            #IMPORTANT: ADD TARGET BACK
-            X_selected["Class"] = y.values
-            return X_selected
-        
+
+            top_features_importance_df = df_feature_importances.sort_values(
+                by="importance",
+                ascending=False
+            )
+
+            num_of_features_to_select = self.config_path[
+                "data_preprocessing"
+            ]["no_of_features"]
+
+            top_features = top_features_importance_df[
+                'feature'
+            ].head(num_of_features_to_select).values
+
+            logger.info(f"Features Selected: {top_features}")
+
+            # Selected features
+            selected_df = df[top_features.tolist()].copy()
+
+            # IMPORTANT -> Add target column back
+            selected_df["Class"] = y.values
+
+            logger.info("Feature Selection is done Successfully....")
+
+            return selected_df
+
         except Exception as e:
-            logger.error(f"Feature selection error: {e}")
-            raise CustomException("Feature Selection Failed", sys)
+            logger.error(f"Error while doing feature selection step {e}")
+            raise CustomException("Error while Feature Selection", sys)
+        
+        
     
     def save_data(self, df, file_path):
         try:
             logger.info("Saving data from preprocessed folder....!")
-
 
             df.to_csv(file_path, index=False)
 
             logger.info(f"Data Saved Successfully to {file_path}")
 
         except Exception as e:
-
             logger.error(f"Error while saving the preprocessed data {e}")
             raise CustomException("Error while saving preprocessed data", sys)
 
@@ -153,13 +165,21 @@ class DataProcessing():
 
             # 3. Handling the Imbalanced Data
             train_df = self.balance_the_data(train_df)
-            test_df = self.balance_the_data(test_df)
+            # test_df = self.balance_the_data(test_df)
 
-            # 3. Feature Selection
+            # 4. Feature Selection
             train_df = self.features_selection(train_df)
-            test_df  = test_df[train_df.columns]
 
+            # Get selected feature columns
+            selected_columns = train_df.columns.tolist()
 
+            # Remove target column from features list
+            selected_columns.remove("Class")
+
+            # Keep same feature columns in test data + target column
+            test_df = test_df[selected_columns + ["Class"]]
+
+            # Save processed data
             self.save_data(train_df, PROCESSED_TRAIN_FILE_PATH)
             self.save_data(test_df, PROCESSED_TEST_FILE_PATH)
 
@@ -170,5 +190,6 @@ class DataProcessing():
             raise CustomException("Error during Data Preprocessing",sys)
 
 if __name__ == "__main__":
+
     data_processor = DataProcessing(TRAIN_FILE_PATH, TEST_FILE_PATH, PROCESSED_DIR, CONFIG_PATH)
     data_processor.process()
