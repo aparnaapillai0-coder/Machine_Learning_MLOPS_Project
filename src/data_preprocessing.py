@@ -68,7 +68,9 @@ class DataProcessing():
             imputer = SimpleImputer(strategy='mean')
             X_imputed = imputer.fit_transform(X)
 
-            smote = SMOTE(random_state=42)
+            print(df["Class"].value_counts())
+
+            smote = SMOTE(random_state=42, k_neighbors=1)
 
             X_res, y_res = smote.fit_resample(X_imputed,y)
 
