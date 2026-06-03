@@ -6,3 +6,4 @@ pyYaml
 imbalanced-learn
 lightgbm
 flask
+docker
