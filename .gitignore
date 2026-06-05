@@ -225,3 +225,6 @@ artifacts/
 __pycache__/
 venv/
 .env
+
+.dvc/
+dvc init

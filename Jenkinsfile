@@ -6,7 +6,7 @@ pipeline {
     }
 
     stages{
-        
+
         stage("Cloning from Github.."){
             steps{
                 script{
@@ -16,27 +16,26 @@ pipeline {
             }
         }
 
-     stage("Creating a Virtual Environment....") {
-            steps {
-                script {
+      stage("Creating a Virtual Environment...."){
+            steps{
+                script{
                     echo 'Creating a Virtual Environment....'
                     sh '''
-                    python -m venv ${VENV_DIR}
+                    python3 -m venv ${VENV_DIR}
                     . ${VENV_DIR}/bin/activate
-                    pip install --upgrade pip
+                    python3 -m pip install --upgrade pip
                     pip install -e .
                     pip install dvc
                     '''
                 }
             }
         }
-     
 
-        stage("DVC Pull") {
-            steps {
-                withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                    script {
-                        echo 'DVC Pull....'
+        stage('DVC Pull'){
+            steps{
+                withCredentials([file(credentialsId:'gcp-key', variable:'GOOGLE_APPLICATION_CREDENTIALS')]){
+                    script{
+                        echo 'DVC pull....'
                         sh '''
                         . ${VENV_DIR}/bin/activate
                         dvc pull
@@ -45,6 +44,5 @@ pipeline {
                 }
             }
         }
-
     }
 }
