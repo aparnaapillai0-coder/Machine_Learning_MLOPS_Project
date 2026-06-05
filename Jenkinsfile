@@ -16,7 +16,8 @@ pipeline {
         }
     }
 
-     stage("Creating a Virtual Environment...."){
+     stages{
+        stage("Creating a Virtual Environment...."){
             steps{
                 script{
                     echo 'Creating a Virtual Environment....'
@@ -29,9 +30,12 @@ pipeline {
                     '''
                 }
             }
-        }
+        }     
+     }
+     
 
-        stage('DVC Pull'){
+        stages{
+            stage('DVC Pull'){
             steps{
                 withCredentials([file(credentialsId:'gcp-key', variable:'GOGLE_APPLICATION_CREDENTIALS')]){
                     script{
@@ -44,4 +48,5 @@ pipeline {
                 }
             }
         }
+    }
 }
