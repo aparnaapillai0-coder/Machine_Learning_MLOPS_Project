@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: ml-app
 spec:
-  replices:1
+  replicas: 1
   selector:
     matchLabels:
       app: ml-app
@@ -13,10 +13,10 @@ spec:
         app: ml-app
     spec:
       containers:
-      name: ml-app-container
-      image: gcr-io/storage-cc-data/ml-project:latest
-      ports:
-      - containerPort: 5000
+      - name: ml-app-container
+        image: gcr.io/storage-cc-data/ml-project:latest
+        ports:
+        - containerPort: 5000
 ---
 apiVersion: v1
 kind: Service
