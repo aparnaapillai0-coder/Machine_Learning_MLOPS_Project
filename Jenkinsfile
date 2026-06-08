@@ -1,5 +1,7 @@
-pipeline {
-    agent any
+Pipeline {
+    agent {
+        label 'docker-enabled'
+    }
     
     environment {
         VENV_DIR = 'venv'

@@ -1,32 +1,30 @@
 FROM python:3.8-slim
 
-# Set environment variables to prevent python from writing .pyc file & we need to ensure Python out is not buffered to avoid issues with logging in Docker
-ENV PYTHONDONTWRITEBYTECODE=1 \
+# Environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-# Installing System Envrionment (Requirement for Tensorflow)
+
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     libatlas-base-dev \
-     libhdfs-dev
-     protobuf-compiler \
-     python3-dev \
-     && apt-get clean \
-     && rm -rf /var/lib/apt/lists/*
+    libhdfs-dev \
+    protobuf-compiler \
+    python3-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Setting the working directionary
+# Set working directory
 WORKDIR /app
 
-# Copy the application code
-COPY ..
+# Copy project files (IMPORTANT: build context must be correct)
+COPY . .
 
-# Installing dependencies from requirements.txt
+# Install Python dependencies
 RUN pip install --no-cache-dir -e .
 
-# Train the model before running the application
-RUN python pipeline/pipeline.py
-
-# Expose the Port that Flask will run
+# Expose Flask port
 EXPOSE 5000
 
-# Command to run the app
+# Run application
 CMD ["python", "application.py"]
