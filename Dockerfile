@@ -1,4 +1,4 @@
-FROM python:3.8-slim
+FROM python:3.8-slim-buster
 
 # Environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -8,7 +8,6 @@ ENV PYTHONUNBUFFERED=1
 RUN apt-get update && apt-get install -y \
     build-essential \
     libatlas-base-dev \
-    libhdfs-dev \
     protobuf-compiler \
     python3-dev \
     && apt-get clean \
