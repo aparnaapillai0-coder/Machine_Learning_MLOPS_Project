@@ -1,11 +1,10 @@
 pipeline {
     agent {
         docker {
-            image 'docker:latest'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
+            image 'python:3.10'
             }
-        }
-
+    }
+    
     environment {
         VENV_DIR = 'venv'
         GCP_PROJECT = 'storage-cc-data'
