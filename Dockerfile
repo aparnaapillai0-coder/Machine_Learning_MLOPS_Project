@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y \
     build-essential \
-    libatlas-base-dev \
+    libopenblas-dev \
     protobuf-compiler \
     python3-dev \
     && apt-get clean \
