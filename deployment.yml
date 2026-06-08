@@ -1,31 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ml-app
+  name: mlops-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ml-app
+      app: mlops-app
   template:
     metadata:
       labels:
-        app: ml-app
+        app: mlops-app
     spec:
       containers:
-      - name: ml-app-container
-        image: gcr.io/storage-cc-data/ml-project:latest
+      - name: mlops-app-container
+        image: mlops-app:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 5000
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: ml-app-service
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
-    app: ml-app
+    app: mlops-app
   ports:
   - protocol: TCP
     port: 80
