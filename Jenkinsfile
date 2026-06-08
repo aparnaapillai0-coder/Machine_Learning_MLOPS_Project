@@ -1,17 +1,20 @@
-Pipeline {
-    agent any
-    
+pipeline {
+    agent {
+        label 'docker-enabled'
+    }
+
     environment {
         VENV_DIR = 'venv'
     }
-    
+
     stages {
+
         stage("Checkout Code") {
             steps {
                 checkout scm
             }
         }
-        
+
         stage("Create Virtual Environment") {
             steps {
                 sh '''
@@ -23,18 +26,16 @@ Pipeline {
                 '''
             }
         }
-        
+
         stage("DVC Pull") {
             steps {
-                withCredentials([file(credentialsId:'gcp-key', variable:'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                    sh '''
-                    . ${VENV_DIR}/bin/activate
-                    dvc pull
-                    '''
-                }
+                sh '''
+                . ${VENV_DIR}/bin/activate
+                dvc pull
+                '''
             }
         }
-        
+
         stage("Build Docker Image") {
             steps {
                 sh '''
@@ -43,7 +44,7 @@ Pipeline {
                 '''
             }
         }
-        
+
         stage("Deploy to Minikube") {
             steps {
                 sh '''
