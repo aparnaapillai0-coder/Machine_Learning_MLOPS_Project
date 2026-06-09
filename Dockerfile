@@ -1,11 +1,14 @@
-FROM python:3.10
+FROM jenkins/jenkins:lts
 
-WORKDIR /app
+USER root
 
-COPY . .
+# Install Docker CLI inside Jenkins container
+RUN apt-get update && \
+    apt-get install -y docker.io && \
+    apt-get clean
 
-RUN pip install -r requirements.txt
+# Add jenkins user to docker group
+RUN groupadd -f docker && \
+    usermod -aG docker jenkins
 
-EXPOSE 5000
-
-CMD ["python", "app.py"]
+USER jenkins
