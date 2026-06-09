@@ -32,10 +32,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                    docker build -t mlops-app .
+                  docker build -t mlops-app .
                 '''
             }
         }
-
     }
 }
