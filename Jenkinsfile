@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "myrepo/myapp:latest"
+        IMAGE_NAME = "aparnaapillai0coder/myapp:latest"
     }
 
     stages {
