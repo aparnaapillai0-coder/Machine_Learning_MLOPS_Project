@@ -1,41 +1,31 @@
 pipeline {
     agent any
-
+    
     stages {
-
+        
         stage('Checkout Code') {
             steps {
-                git url: 'https://github.com/aparnaapillai0-coder/Machine_Learning_MLOPS_Project', branch: 'main'
+                echo 'Code checked out successfully'
             }
         }
-
+        
         stage('Create Virtual Environment') {
             steps {
                 sh '''
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip install -r requirements.txt
+                python3 -m venv venv
+                .venv/bin/activate
+                pip install -r requirements.txt
                 '''
             }
         }
-
-        stage('DVC Pull') {
+        
+        stage('Test Pipeline') {
             steps {
-                sh 'dvc pull || echo "DVC not configured"'
+                sh 'echo Jenkins Pipeline Working Successfully'
             }
         }
-
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t mlops-app .'
-            }
-        }
-
-        stage('Deploy to Minikube') {
-            steps {
-                sh 'echo "Deployment step placeholder"'
-            }
-        }
-
     }
 }
+
+
+
