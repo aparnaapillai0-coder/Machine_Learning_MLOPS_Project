@@ -1,10 +1,10 @@
 pipeline {
     agent any
-
+    
     stages {
-        
+
         stage('Checkout Code') {
-             steps {
+            steps {
                 echo 'Code checked out successfully'
             }
         }
@@ -29,12 +29,11 @@ pipeline {
             }
         }
 
-        stage('Test Pipeline') {
+        stage('Build Docker Image') {
             steps {
-                sh 'echo Jenkins Pipeline Working Successfully'
+                sh 'docker build -t mlops-app .'
             }
         }
+
     }
 }
-
-
