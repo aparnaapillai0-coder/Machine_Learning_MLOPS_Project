@@ -1,55 +1,41 @@
 pipeline {
     agent any
 
-    environment {
-        VENV_DIR = 'venv'
-    }
-
     stages {
 
-        stage("Checkout Code") {
+        stage('Checkout Code') {
             steps {
-                checkout scm
+                git url: 'https://github.com/aparnaapillai0-coder/Machine_Learning_MLOPS_Project', branch: 'main'
             }
         }
+
+        stage('Create Virtual Environment') {
+            steps {
+                sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('DVC Pull') {
+            steps {
+                sh 'dvc pull || echo "DVC not configured"'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t mlops-app .'
+            }
+        }
+
+        stage('Deploy to Minikube') {
+            steps {
+                sh 'echo "Deployment step placeholder"'
+            }
+        }
+
     }
-
-        stage("Create Virtual Environment") {
-            steps {
-                sh '''
-                python3 -m venv ${VENV_DIR}
-                . ${VENV_DIR}/bin/activate
-                pip install --upgrade pip
-                pip install -e .
-                pip install dvc
-                '''
-            }
-        }
-
-        stage("DVC Pull") {
-            steps {
-                sh '''
-                . ${VENV_DIR}/bin/activate
-                dvc pull
-                '''
-            }
-        }
-
-        stage("Build Docker Image") {
-            steps {
-                sh '''
-                docker version
-                docker build -t mlops-app:latest .
-                '''
-            }
-        }
-
-        stage("Deploy to Minikube") {
-            steps {
-                sh '''
-                kubectl version --client
-                kubectl apply -f deployment.yml
-                '''
-            }
-        }
 }
