@@ -7,36 +7,17 @@ pipeline {
 
     stages {
 
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Verify Docker') {
+        stage('Docker Info') {
             steps {
                 sh '''
                 docker version || true
                 docker ps || true
-                '''
-            }
-        }
-
-        stage('Setup Python Env') {
-            steps {
-                sh '''
-                python3 -m venv venv
-                ./venv/bin/pip install --upgrade pip
-                ./venv/bin/pip install -r requirements.txt
-                '''
-            }
-        }
-
-        stage('DVC Pull') {
-            steps {
-                sh '''
-                ./venv/bin/pip install dvc
-                ./venv/bin/dvc pull || true
                 '''
             }
         }
@@ -67,7 +48,6 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                kubectl version || true
                 kubectl apply -f deployment.yml
                 kubectl apply -f service.yml
                 kubectl rollout status deployment/mlops-app || true
@@ -78,10 +58,10 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment successful'
+            echo "MLOPS Pipeline SUCCESS"
         }
         failure {
-            echo 'Pipeline failed - check logs'
+            echo "Pipeline FAILED check logs"
         }
     }
 }

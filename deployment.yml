@@ -6,14 +6,14 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mlops-app
+      app: mlops
   template:
     metadata:
       labels:
-        app: mlops-app
+        app: mlops
     spec:
       containers:
-      - name: mlops-app-container
+      - name: mlops
         image: aparnaapillai0coder/myapp:latest
         ports:
-        - containerPort: 8080
+        - containerPort: 5000
