@@ -1,7 +1,4 @@
-FROM python:3.10-slim
-
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -19,4 +16,4 @@ RUN pip install --no-cache-dir -e .
 
 EXPOSE 5000
 
-CMD ["python", "application.py"]
+CMD ["python","application.py"]
