@@ -3,13 +3,13 @@ pipeline {
 
     environment {
         IMAGE_NAME = "myrepo/myapp:latest"
+        CONTAINER_NAME = "myapp"
     }
 
     stages {
 
         stage('Checkout Code') {
             steps {
-                echo 'Code checkout completed'
                 checkout scm
             }
         }
@@ -43,23 +43,29 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                sh '''
-                docker login -u $DOCKER_USER -p $DOCKER_PASS
-                docker push $IMAGE_NAME
-                '''
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    docker push $IMAGE_NAME
+                    '''
+                }
             }
         }
 
         stage('Deploy') {
             steps {
                 sh '''
-                docker stop myapp || true
-                docker rm myapp || true
+                docker stop $CONTAINER_NAME || true
+                docker rm $CONTAINER_NAME || true
 
                 docker pull $IMAGE_NAME
 
                 docker run -d \
-                    --name myapp \
+                    --name $CONTAINER_NAME \
                     -p 80:8080 \
                     $IMAGE_NAME
                 '''
