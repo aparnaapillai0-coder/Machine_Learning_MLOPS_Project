@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         IMAGE_NAME = "myrepo/myapp:latest"
-        CONTAINER_NAME = "myapp"
     }
 
     stages {
@@ -14,7 +13,7 @@ pipeline {
             }
         }
 
-        stage('Create Virtual Environment & Install Dependencies') {
+        stage('Setup Environment') {
             steps {
                 sh '''
                 python3 -m venv venv
@@ -56,18 +55,13 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                docker stop $CONTAINER_NAME || true
-                docker rm $CONTAINER_NAME || true
+                kubectl apply -f deployment.yml
+                kubectl apply -f service.yml
 
-                docker pull $IMAGE_NAME
-
-                docker run -d \
-                    --name $CONTAINER_NAME \
-                    -p 80:8080 \
-                    $IMAGE_NAME
+                kubectl rollout status deployment/mlops-app
                 '''
             }
         }
@@ -75,7 +69,7 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline executed successfully'
+            echo 'Deployment to Kubernetes successful'
         }
         failure {
             echo 'Pipeline failed Check logs'
