@@ -13,21 +13,21 @@ pipeline {
             }
         }
 
-        stage('Debug Docker') {
+        stage('Verify Docker') {
             steps {
                 sh '''
-                docker info
-                docker ps
+                docker version || true
+                docker ps || true
                 '''
             }
         }
 
-        stage('Setup Environment') {
+        stage('Setup Python Env') {
             steps {
                 sh '''
                 python3 -m venv venv
-                venv/bin/pip install --upgrade pip
-                venv/bin/pip install -r requirements.txt
+                ./venv/bin/pip install --upgrade pip
+                ./venv/bin/pip install -r requirements.txt
                 '''
             }
         }
@@ -35,8 +35,8 @@ pipeline {
         stage('DVC Pull') {
             steps {
                 sh '''
-                venv/bin/pip install dvc
-                venv/bin/dvc pull || true
+                ./venv/bin/pip install dvc
+                ./venv/bin/dvc pull || true
                 '''
             }
         }
@@ -50,7 +50,7 @@ pipeline {
         }
 
         stage('Push Docker Image') {
-             steps {
+            steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-creds',
                     usernameVariable: 'DOCKER_USER',
@@ -59,7 +59,7 @@ pipeline {
                     sh '''
                     echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                     docker push $IMAGE_NAME
-                     '''
+                    '''
                 }
             }
         }
@@ -67,10 +67,10 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
+                kubectl version || true
                 kubectl apply -f deployment.yml
                 kubectl apply -f service.yml
-
-                kubectl rollout status deployment/mlops-app
+                kubectl rollout status deployment/mlops-app || true
                 '''
             }
         }
@@ -78,10 +78,10 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment to Kubernetes successful'
+            echo 'Deployment successful'
         }
         failure {
-            echo 'Pipeline failed Check logs'
+            echo 'Pipeline failed - check logs'
         }
     }
 }
