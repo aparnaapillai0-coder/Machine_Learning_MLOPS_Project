@@ -13,6 +13,15 @@ pipeline {
             }
         }
 
+        stage('Debug Docker') {
+            steps {
+                sh '''
+                docker info
+                docker ps
+                '''
+            }
+        }
+
         stage('Setup Environment') {
             steps {
                 sh '''
