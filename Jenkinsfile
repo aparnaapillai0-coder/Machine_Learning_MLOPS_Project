@@ -1,67 +1,41 @@
 pipeline {
     agent any
-    
-    environment {
-        IMAGE_NAME = "aparnaapillai0coder/myapp:latest"
-    }
 
     stages {
 
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                checkout scm
+                git url: 'https://github.com/aparnaapillai0-coder/Machine_Learning_MLOPS_Project', branch: 'main'
             }
         }
 
-        stage('Docker Info') {
+        stage('Create Virtual Environment') {
             steps {
                 sh '''
-                docker version || true
-                docker ps || true
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install -r requirements.txt
                 '''
+            }
+        }
+
+        stage('DVC Pull') {
+            steps {
+                sh 'dvc pull || echo "DVC not configured"'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh '''
-                docker build -t $IMAGE_NAME .
-                '''
+                sh 'docker build -t mlops-app .'
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Deploy to Minikube') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    sh '''
-                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                    docker push $IMAGE_NAME
-                    '''
-                }
+                sh 'echo "Deployment step placeholder"'
             }
         }
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                sh '''
-                kubectl apply -f deployment.yml
-                kubectl apply -f service.yml
-                kubectl rollout status deployment/mlops-app || true
-                '''
-            }
-        }
-    }
-
-    post {
-        success {
-            echo "MLOPS Pipeline SUCCESS"
-        }
-        failure {
-            echo "Pipeline FAILED check logs"
-        }
     }
 }
