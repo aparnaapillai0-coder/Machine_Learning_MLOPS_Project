@@ -12,6 +12,7 @@ pipeline {
                 checkout scm
             }
         }
+    }
 
         stage("Create Virtual Environment") {
             steps {
@@ -51,5 +52,4 @@ pipeline {
                 '''
             }
         }
-    }
 }
