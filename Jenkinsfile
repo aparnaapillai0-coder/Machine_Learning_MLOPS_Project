@@ -31,7 +31,9 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t mlops-app .'
+                sh '''
+                sudo docker build -t mlops-app .
+                '''
             }
         }
 
