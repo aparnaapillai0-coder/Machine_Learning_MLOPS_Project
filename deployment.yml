@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: mlops-app-container
-        image: myrepo/myapp:latest
+        image: aparnaapillai0coder/myapp:latest
         ports:
         - containerPort: 8080
