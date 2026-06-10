@@ -15,5 +15,6 @@ spec:
       containers:
       - name: mlops
         image: aparnaapillai0coder/myapp:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000

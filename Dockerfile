@@ -1,14 +1,33 @@
-FROM jenkins/jenkins:lts
+FROM python:3.8-slim
 
-USER root
+# Environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
-# Install Docker CLI inside Jenkins container
-RUN apt-get update && \
-    apt-get install -y docker.io && \
-    apt-get clean
+# System dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libatlas-base-dev \
+    libhdfs-dev \
+    protobuf-compiler \
+    python3-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Add jenkins user to docker group
-RUN groupadd -f docker && \
-    usermod -aG docker jenkins
+# Work directory
+WORKDIR /app
 
-USER jenkins
+# Copy project files
+COPY . .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Train model (if required during build)
+RUN python pipeline/pipeline.py
+
+# Expose Flask port
+EXPOSE 5000
+
+# Run application
+CMD ["python", "application.py"]
