@@ -46,15 +46,8 @@ pipeline {
         }
         
         stage('Deploy to Kubernetes') {
-            when {
-                expression { false }
-            }
             steps {
-                sh '''
-                kubectl apply -f deployment.yml
-                kubectl apply -f service.yml
-                kubectl rollout status deployment/mlops-app
-                '''
+                echo 'Kubernetes deployment skipped'
             }
         }
         
