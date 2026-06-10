@@ -1,6 +1,6 @@
 pandas
 numpy
-scikit-learn==1.7.1
+scikit-learn
 google-cloud-storage
 PyYAML
 imbalanced-learn
