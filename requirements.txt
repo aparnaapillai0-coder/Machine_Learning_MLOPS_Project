@@ -1,9 +1,8 @@
 pandas
 numpy
-scikit-learn==1.8.0
+scikit-learn==1.7.1
 google-cloud-storage
-pyYaml
+PyYAML
 imbalanced-learn
 lightgbm
 flask
-docker
