@@ -4,3 +4,6 @@ __pycache__/
 *.pyc
 .mlruns/
 .dvc/cache/
+*.pkl
+*.h5
+.env
