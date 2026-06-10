@@ -44,8 +44,11 @@ pipeline {
                 }
             }
         }
-
+        
         stage('Deploy to Kubernetes') {
+            when {
+                expression { false }
+            }
             steps {
                 sh '''
                 kubectl apply -f deployment.yml
@@ -54,14 +57,14 @@ pipeline {
                 '''
             }
         }
-    }
-
-    post {
-        success {
-            echo "MLOPS Pipeline SUCCESS"
-        }
-        failure {
-            echo "Pipeline FAILED check logs"
+        
+        post {
+            success {
+                echo "MLOPS Pipeline SUCCESS"
+            }
+            failure {
+                echo "Pipeline FAILED check logs"
+            }
         }
     }
 }
